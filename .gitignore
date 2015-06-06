@@ -1,0 +1,5 @@
+node_modules/
+tiddlers/
+wiki/*
+wiki-dist/*
+!wiki-dist/output/index.html
