@@ -1,0 +1,8 @@
+created: 20150619122316900
+modified: 20150619131650189
+tags: $:/tags/PageTemplate
+title: GitHubRibbon
+type: text/vnd.tiddlywiki
+
+<div class="github-fork-ribbon-wrapper left"><div class="github-fork-ribbon"><a href="https://github.com/sukima/GitFixUm">Fork me on ~GitHub</a></div>
+</div>
