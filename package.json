@@ -1,6 +1,6 @@
 {
   "name": "git-fix-um",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "On undoing, fixing, or removing commits or mistakes in git ",
   "private": true,
   "scripts": {
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SethRobertson/GitFixUm.git"
+    "url": "git+https://github.com/sukima/GitFixUm.git"
   },
   "author": "Devin Weaver <suki@tritarget.org> (http://tritarget.org/)",
   "license": "CC BY-SA 3.0",
   "bugs": {
-    "url": "https://github.com/SethRobertson/GitFixUm/issues"
+    "url": "https://github.com/sukima/GitFixUm/issues"
   },
-  "homepage": "http://sethrobertson.github.io/GitFixUm/fixup.html",
+  "homepage": "http://sukima.github.io/GitFixUm/",
   "devDependencies": {
     "tiddlywiki": "^5.1.8"
   }
