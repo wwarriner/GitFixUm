@@ -127,7 +127,13 @@ Error message and password prompt
 
 <li>$:/isEncrypted</li>
 
+<li>$:/plugins/tiddlywiki/filesystem</li>
+
+<li>$:/plugins/tiddlywiki/github-fork-ribbon</li>
+
 <li>$:/plugins/tiddlywiki/highlight</li>
+
+<li>$:/plugins/tiddlywiki/tiddlyweb</li>
 
 <li>$:/SiteSubtitle</li>
 
@@ -188,6 +194,8 @@ Error message and password prompt
 <li>FindingACommit</li>
 
 <li>First step</li>
+
+<li>GitHubRibbon</li>
 
 <li>GNU FDL</li>
 
@@ -273,10 +281,10 @@ Error message and password prompt
 <!--~~ Ordinary tiddlers ~~-->
 
 <div id="storeArea" style="display:none;">
-<div created="20150606145603553" modified="20150606055212755" title="$:/config/DefaultSidebarTab" type="text/vnd.tiddlywiki">
+<div created="20150606145603553" modified="20150606055212755" title="$:/config/DefaultSidebarTab" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>TableOfContents</pre>
 </div>
-<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="" description="TiddlyWiki5 core" list="readme" plugin-priority="0" plugin-type="plugin" title="$:/core" type="application/json" version="5.1.8">
+<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="" description="TiddlyWiki5 core" list="readme" plugin-priority="0" plugin-type="plugin" title="$:/core" type="application/json" version="5.1.8" revision="0" bag="default">
 <pre>{
     &quot;tiddlers&quot;: {
         &quot;$:/Acknowledgements&quot;: {
@@ -5752,18 +5760,53 @@ Error message and password prompt
     }
 }</pre>
 </div>
-<div branch="master" created="20150606022747695" modified="20150606044711776" tags="" title="$:/data/BranchName" type="text/vnd.tiddlywiki">
+<div branch="master" created="20150606022747695" modified="20150606044711776" tags="" title="$:/data/BranchName" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre></pre>
 </div>
-<div created="20150605123544055" modified="20150606052319109" title="$:/DefaultTiddlers" type="text/vnd.tiddlywiki">
+<div created="20150605123544055" modified="20150606052319109" title="$:/DefaultTiddlers" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>[[First step]]
 [[Are you trying to find that which is lost or fix a change that was made?]]
 </pre>
 </div>
-<div title="$:/isEncrypted">
+<div title="$:/isEncrypted" revision="0" bag="default">
 <pre>no</pre>
 </div>
-<div author="JoaoBolila" core-version="&gt;=5.0.0" dependents="" description="Highlight.js: syntax highlighting" list="readme usage license" plugin-type="plugin" title="$:/plugins/tiddlywiki/highlight" type="application/json" version="5.1.8">
+<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="" description="Local filesystem syncadaptor" list="readme" plugin-type="plugin" title="$:/plugins/tiddlywiki/filesystem" type="application/json" version="5.1.8" revision="0" bag="default">
+<pre>{
+    &quot;tiddlers&quot;: {
+        &quot;$:/plugins/tiddlywiki/filesystem/filesystemadaptor.js&quot;: {
+            &quot;text&quot;: &quot;/*\\\ntitle: $:/plugins/tiddlywiki/filesystem/filesystemadaptor.js\ntype: application/javascript\nmodule-type: syncadaptor\n\nA sync adaptor module for synchronising with the local filesystem via node.js APIs\n\n\\*/\n(function(){\n\n/*jslint node: true, browser: true */\n/*global $tw: false */\n\&quot;use strict\&quot;;\n\n// Get a reference to the file system\nvar fs = $tw.node ? require(\&quot;fs\&quot;) : null,\n\tpath = $tw.node ? require(\&quot;path\&quot;) : null;\n\nfunction FileSystemAdaptor(options) {\n\tvar self = this;\n\tthis.wiki = options.wiki;\n\tthis.logger = new $tw.utils.Logger(\&quot;FileSystem\&quot;);\n\t// Create the &lt;wiki&gt;/tiddlers folder if it doesn't exist\n\t$tw.utils.createDirectory($tw.boot.wikiTiddlersPath);\n}\n\nFileSystemAdaptor.prototype.getTiddlerInfo = function(tiddler) {\n\treturn {};\n};\n\n$tw.config.typeInfo = {\n\t\&quot;text/vnd.tiddlywiki\&quot;: {\n\t\tfileType: \&quot;application/x-tiddler\&quot;,\n\t\textension: \&quot;.tid\&quot;\n\t},\n\t\&quot;image/jpeg\&quot; : {\n\t\thasMetaFile: true\n\t}\n};\n\n$tw.config.typeTemplates = {\n\t\&quot;application/x-tiddler\&quot;: \&quot;$:/core/templates/tid-tiddler\&quot;\n};\n\nFileSystemAdaptor.prototype.getTiddlerFileInfo = function(tiddler,callback) {\n\t// See if we've already got information about this file\n\tvar self = this,\n\t\ttitle = tiddler.fields.title,\n\t\tfileInfo = $tw.boot.files[title];\n\t// Get information about how to save tiddlers of this type\n\tvar type = tiddler.fields.type || \&quot;text/vnd.tiddlywiki\&quot;,\n\t\ttypeInfo = $tw.config.typeInfo[type];\n\tif(!typeInfo) {\n\t\ttypeInfo = $tw.config.typeInfo[\&quot;text/vnd.tiddlywiki\&quot;];\n\t}\n\tvar extension = typeInfo.extension || \&quot;\&quot;;\n\tif(!fileInfo) {\n\t\t// If not, we'll need to generate it\n\t\t// Start by getting a list of the existing files in the directory\n\t\tfs.readdir($tw.boot.wikiTiddlersPath,function(err,files) {\n\t\t\tif(err) {\n\t\t\t\treturn callback(err);\n\t\t\t}\n\t\t\t// Assemble the new fileInfo\n\t\t\tfileInfo = {};\n\t\t\tfileInfo.filepath = $tw.boot.wikiTiddlersPath + path.sep + self.generateTiddlerFilename(title,extension,files);\n\t\t\tfileInfo.type = typeInfo.fileType || tiddler.fields.type;\n\t\t\tfileInfo.hasMetaFile = typeInfo.hasMetaFile;\n\t\t\t// Save the newly created fileInfo\n\t\t\t$tw.boot.files[title] = fileInfo;\n\t\t\t// Pass it to the callback\n\t\t\tcallback(null,fileInfo);\n\t\t});\n\t} else {\n\t\t// Otherwise just invoke the callback\n\t\tcallback(null,fileInfo);\n\t}\n};\n\n/*\nTransliterate string from cyrillic russian to latin\n*/\n var transliterate = function(cyrillyc) {\n\tvar a = {\&quot;Ё\&quot;:\&quot;YO\&quot;,\&quot;Й\&quot;:\&quot;I\&quot;,\&quot;Ц\&quot;:\&quot;TS\&quot;,\&quot;У\&quot;:\&quot;U\&quot;,\&quot;К\&quot;:\&quot;K\&quot;,\&quot;Е\&quot;:\&quot;E\&quot;,\&quot;Н\&quot;:\&quot;N\&quot;,\&quot;Г\&quot;:\&quot;G\&quot;,\&quot;Ш\&quot;:\&quot;SH\&quot;,\&quot;Щ\&quot;:\&quot;SCH\&quot;,\&quot;З\&quot;:\&quot;Z\&quot;,\&quot;Х\&quot;:\&quot;H\&quot;,\&quot;Ъ\&quot;:\&quot;'\&quot;,\&quot;ё\&quot;:\&quot;yo\&quot;,\&quot;й\&quot;:\&quot;i\&quot;,\&quot;ц\&quot;:\&quot;ts\&quot;,\&quot;у\&quot;:\&quot;u\&quot;,\&quot;к\&quot;:\&quot;k\&quot;,\&quot;е\&quot;:\&quot;e\&quot;,\&quot;н\&quot;:\&quot;n\&quot;,\&quot;г\&quot;:\&quot;g\&quot;,\&quot;ш\&quot;:\&quot;sh\&quot;,\&quot;щ\&quot;:\&quot;sch\&quot;,\&quot;з\&quot;:\&quot;z\&quot;,\&quot;х\&quot;:\&quot;h\&quot;,\&quot;ъ\&quot;:\&quot;'\&quot;,\&quot;Ф\&quot;:\&quot;F\&quot;,\&quot;Ы\&quot;:\&quot;I\&quot;,\&quot;В\&quot;:\&quot;V\&quot;,\&quot;А\&quot;:\&quot;a\&quot;,\&quot;П\&quot;:\&quot;P\&quot;,\&quot;Р\&quot;:\&quot;R\&quot;,\&quot;О\&quot;:\&quot;O\&quot;,\&quot;Л\&quot;:\&quot;L\&quot;,\&quot;Д\&quot;:\&quot;D\&quot;,\&quot;Ж\&quot;:\&quot;ZH\&quot;,\&quot;Э\&quot;:\&quot;E\&quot;,\&quot;ф\&quot;:\&quot;f\&quot;,\&quot;ы\&quot;:\&quot;i\&quot;,\&quot;в\&quot;:\&quot;v\&quot;,\&quot;а\&quot;:\&quot;a\&quot;,\&quot;п\&quot;:\&quot;p\&quot;,\&quot;р\&quot;:\&quot;r\&quot;,\&quot;о\&quot;:\&quot;o\&quot;,\&quot;л\&quot;:\&quot;l\&quot;,\&quot;д\&quot;:\&quot;d\&quot;,\&quot;ж\&quot;:\&quot;zh\&quot;,\&quot;э\&quot;:\&quot;e\&quot;,\&quot;Я\&quot;:\&quot;Ya\&quot;,\&quot;Ч\&quot;:\&quot;CH\&quot;,\&quot;С\&quot;:\&quot;S\&quot;,\&quot;М\&quot;:\&quot;M\&quot;,\&quot;И\&quot;:\&quot;I\&quot;,\&quot;Т\&quot;:\&quot;T\&quot;,\&quot;Ь\&quot;:\&quot;'\&quot;,\&quot;Б\&quot;:\&quot;B\&quot;,\&quot;Ю\&quot;:\&quot;YU\&quot;,\&quot;я\&quot;:\&quot;ya\&quot;,\&quot;ч\&quot;:\&quot;ch\&quot;,\&quot;с\&quot;:\&quot;s\&quot;,\&quot;м\&quot;:\&quot;m\&quot;,\&quot;и\&quot;:\&quot;i\&quot;,\&quot;т\&quot;:\&quot;t\&quot;,\&quot;ь\&quot;:\&quot;'\&quot;,\&quot;б\&quot;:\&quot;b\&quot;,\&quot;ю\&quot;:\&quot;yu\&quot;};\n\treturn cyrillyc.split(\&quot;\&quot;).map(function (char) {\n\t\treturn a[char] || char;\n\t}).join(\&quot;\&quot;);\n};\n\n/*\nGiven a tiddler title and an array of existing filenames, generate a new legal filename for the title, case insensitively avoiding the array of existing filenames\n*/\nFileSystemAdaptor.prototype.generateTiddlerFilename = function(title,extension,existingFilenames) {\n\t// First remove any of the characters that are illegal in Windows filenames\n\tvar baseFilename = transliterate(title.replace(/&lt;|&gt;|\\:|\\\&quot;|\\/|\\\\|\\||\\?|\\*|\\^|\\s/g,\&quot;_\&quot;));\n\t// Truncate the filename if it is too long\n\tif(baseFilename.length &gt; 200) {\n\t\tbaseFilename = baseFilename.substr(0,200);\n\t}\n\t// Start with the base filename plus the extension\n\tvar filename = baseFilename + extension,\n\t\tcount = 1;\n\t// Add a discriminator if we're clashing with an existing filename while\n\t// handling case-insensitive filesystems (NTFS, FAT/FAT32, etc.)\n\twhile(existingFilenames.some(function(value) {return value.toLocaleLowerCase() === filename.toLocaleLowerCase();})) {\n\t\tfilename = baseFilename + \&quot; \&quot; + (count++) + extension;\n\t}\n\treturn filename;\n};\n\n/*\nSave a tiddler and invoke the callback with (err,adaptorInfo,revision)\n*/\nFileSystemAdaptor.prototype.saveTiddler = function(tiddler,callback) {\n\tvar self = this;\n\tthis.getTiddlerFileInfo(tiddler,function(err,fileInfo) {\n\t\tvar template, content, encoding,\n\t\t\t_finish = function() {\n\t\t\t\tcallback(null, {}, 0);\n\t\t\t};\n\t\tif(err) {\n\t\t\treturn callback(err);\n\t\t}\n\t\tif(fileInfo.hasMetaFile) {\n\t\t\t// Save the tiddler as a separate body and meta file\n\t\t\tvar typeInfo = $tw.config.contentTypeInfo[fileInfo.type];\n\t\t\tfs.writeFile(fileInfo.filepath,tiddler.fields.text,{encoding: typeInfo.encoding},function(err) {\n\t\t\t\tif(err) {\n\t\t\t\t\treturn callback(err);\n\t\t\t\t}\n\t\t\t\tcontent = self.wiki.renderTiddler(\&quot;text/plain\&quot;,\&quot;$:/core/templates/tiddler-metadata\&quot;,{variables: {currentTiddler: tiddler.fields.title}});\n\t\t\t\tfs.writeFile(fileInfo.filepath + \&quot;.meta\&quot;,content,{encoding: \&quot;utf8\&quot;},function (err) {\n\t\t\t\t\tif(err) {\n\t\t\t\t\t\treturn callback(err);\n\t\t\t\t\t}\n\t\t\t\t\tself.logger.log(\&quot;Saved file\&quot;,fileInfo.filepath);\n\t\t\t\t\t_finish();\n\t\t\t\t});\n\t\t\t});\n\t\t} else {\n\t\t\t// Save the tiddler as a self contained templated file\n\t\t\ttemplate = $tw.config.typeTemplates[fileInfo.type];\n\t\t\tcontent = self.wiki.renderTiddler(\&quot;text/plain\&quot;,template,{variables: {currentTiddler: tiddler.fields.title}});\n\t\t\tfs.writeFile(fileInfo.filepath,content,{encoding: \&quot;utf8\&quot;},function (err) {\n\t\t\t\tif(err) {\n\t\t\t\t\treturn callback(err);\n\t\t\t\t}\n\t\t\t\tself.logger.log(\&quot;Saved file\&quot;,fileInfo.filepath);\n\t\t\t\t_finish();\n\t\t\t});\n\t\t}\n\t});\n};\n\n/*\nLoad a tiddler and invoke the callback with (err,tiddlerFields)\n\nWe don't need to implement loading for the file system adaptor, because all the tiddler files will have been loaded during the boot process.\n*/\nFileSystemAdaptor.prototype.loadTiddler = function(title,callback) {\n\tcallback(null,null);\n};\n\n/*\nDelete a tiddler and invoke the callback with (err)\n*/\nFileSystemAdaptor.prototype.deleteTiddler = function(title,callback,options) {\n\tvar self = this,\n\t\tfileInfo = $tw.boot.files[title];\n\t// Only delete the tiddler if we have writable information for the file\n\tif(fileInfo) {\n\t\t// Delete the file\n\t\tfs.unlink(fileInfo.filepath,function(err) {\n\t\t\tif(err) {\n\t\t\t\treturn callback(err);\n\t\t\t}\n\t\t\tself.logger.log(\&quot;Deleted file\&quot;,fileInfo.filepath);\n\t\t\t// Delete the metafile if present\n\t\t\tif(fileInfo.hasMetaFile) {\n\t\t\t\tfs.unlink(fileInfo.filepath + \&quot;.meta\&quot;,function(err) {\n\t\t\t\t\tif(err) {\n\t\t\t\t\t\treturn callback(err);\n\t\t\t\t\t}\n\t\t\t\t\tcallback(null);\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tcallback(null);\n\t\t\t}\n\t\t});\n\t} else {\n\t\tcallback(null);\n\t}\n};\n\nif(fs) {\n\texports.adaptorClass = FileSystemAdaptor;\n}\n\n})();\n&quot;,
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/filesystem/filesystemadaptor.js&quot;,
+            &quot;type&quot;: &quot;application/javascript&quot;,
+            &quot;module-type&quot;: &quot;syncadaptor&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/filesystem/readme&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/filesystem/readme&quot;,
+            &quot;text&quot;: &quot;The filesystem plugin is used under Node.js to synchronise tiddler changes back to the file system. It is inert when used in the browser.\n\n[[Source code|https://github.com/Jermolene/TiddlyWiki5/blob/master/plugins/tiddlywiki/filesystem]]\n&quot;
+        }
+    }
+}</pre>
+</div>
+<div author="Simon Whitaker, adapted for TiddlyWiki by JeremyRuston" dependents="" description="Corner ribbon" list="readme usage" plugin-type="plugin" title="$:/plugins/tiddlywiki/github-fork-ribbon" type="application/json" version="5.1.8" revision="0" bag="default">
+<pre>{
+    &quot;tiddlers&quot;: {
+        &quot;$:/plugins/tiddlywiki/github-fork-ribbon/readme&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/github-fork-ribbon/readme&quot;,
+            &quot;text&quot;: &quot;This plugin provides a diagonal ribbon across the corner of the window. It resembles the design used by ~GitHub for their \&quot;Fork me on ~GitHub\&quot; ribbons.\n\nThe ribbon can be positioned over any corner, and can incorporate user defined text, colours and a link.\n\nThe CSS stylesheet is adapted from work by Simon Whitaker:\n\nhttps://github.com/simonwhitaker/github-fork-ribbon-css/\n\n[[Source code|https://github.com/Jermolene/TiddlyWiki5/blob/master/plugins/tiddlywiki/github-fork-ribbon]]\n&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/github-fork-ribbon/styles&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/github-fork-ribbon/styles&quot;,
+            &quot;tags&quot;: &quot;[[$:/tags/Stylesheet]]&quot;,
+            &quot;text&quot;: &quot;/* Left will inherit from right (so we don't need to duplicate code */\n.github-fork-ribbon {\n  /* The right and left lasses determine the side we attach our banner to */\n  position: absolute;\n\n  /* Add a bit of padding to give some substance outside the \&quot;stitching\&quot; */\n  padding: 2px 0;\n\n  /* Set the base colour */\n  background-color: #a00;\n\n  /* Set a gradient: transparent black at the top to almost-transparent black at the bottom */\n  background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.00)), to(rgba(0, 0, 0, 0.15)));\n  background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));\n  background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));\n  background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));\n  background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));\n  background-image: linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));\n  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#000000', EndColorStr='#000000');\n\n  /* Add a drop shadow */\n  -webkit-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5);\n  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5);\n\n  z-index: 999;\n  pointer-events: auto;\n}\n\n.github-fork-ribbon a, .github-fork-ribbon a.tc-tiddlylink,\n.github-fork-ribbon a:hover, .github-fork-ribbon a.tc-tiddlylink:hover  {\n  /* Set the font */\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, Arial, sans-serif;\n  font-size: 13px;\n  font-weight: 700;\n  color: white;\n\n  /* Set the text properties */\n  text-decoration: none;\n  text-shadow: 0 -1px rgba(0,0,0,0.5);\n  text-align: center;\n\n  /* Set the geometry. If you fiddle with these you'll also need to tweak the top and right values in #github-fork-ribbon. */\n  width: 200px;\n  line-height: 20px;\n\n  /* Set the layout properties */\n  display: inline-block;\n  padding: 2px 0;\n\n  /* Add \&quot;stitching\&quot; effect */\n  border-width: 1px 0;\n  border-style: dotted;\n  border-color: rgba(255,255,255,0.7);\n}\n\n.github-fork-ribbon-wrapper {\n  width: 150px;\n  height: 150px;\n  position: absolute;\n  overflow: hidden;\n  top: 0;\n  z-index: 999;\n  pointer-events: none;\n}\n\n.github-fork-ribbon-wrapper.fixed {\n  position: fixed;\n}\n\n.github-fork-ribbon-wrapper.left {\n  left: 0;\n}\n\n.github-fork-ribbon-wrapper.right {\n  right: 0;\n}\n\n.github-fork-ribbon-wrapper.left-bottom {\n  position: fixed;\n  top: inherit;\n  bottom: 0;\n  left: 0;\n}\n\n.github-fork-ribbon-wrapper.right-bottom {\n  position: fixed;\n  top: inherit;\n  bottom: 0;\n  right: 0;\n}\n\n.github-fork-ribbon-wrapper.right .github-fork-ribbon {\n  top: 42px;\n  right: -43px;\n\n  /* Rotate the banner 45 degrees */\n  -webkit-transform: rotate(45deg);\n  -moz-transform: rotate(45deg);\n  -o-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.github-fork-ribbon-wrapper.left .github-fork-ribbon {\n  top: 42px;\n  left: -43px;\n\n  /* Rotate the banner -45 degrees */\n  -webkit-transform: rotate(-45deg);\n  -moz-transform: rotate(-45deg);\n  -o-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n}\n\n\n.github-fork-ribbon-wrapper.left-bottom .github-fork-ribbon {\n  top: 80px;\n  left: -43px;\n\n  /* Rotate the banner -45 degrees */\n  -webkit-transform: rotate(45deg);\n  -moz-transform: rotate(45deg);\n  -o-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.github-fork-ribbon-wrapper.right-bottom .github-fork-ribbon {\n  top: 80px;\n  right: -43px;\n\n  /* Rotate the banner -45 degrees */\n  -webkit-transform: rotate(-45deg);\n  -moz-transform: rotate(-45deg);\n  -o-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n}\n&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/github-fork-ribbon/usage&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/github-fork-ribbon/usage&quot;,
+            &quot;text&quot;: &quot;```\n&lt;!-- TOP RIGHT RIBBON: START COPYING HERE --&gt;\n&lt;div class=\&quot;github-fork-ribbon-wrapper right\&quot;&gt;&lt;div class=\&quot;github-fork-ribbon\&quot;&gt;&lt;a href=\&quot;https://github.com/simonwhitaker/github-fork-ribbon-css\&quot;&gt;Fork me on ~GitHub&lt;/a&gt;&lt;/div&gt;\n&lt;/div&gt;\n&lt;!-- TOP RIGHT RIBBON: END COPYING HERE --&gt;\n\n&lt;!-- TOP LEFT RIBBON: START COPYING HERE --&gt;\n&lt;div class=\&quot;github-fork-ribbon-wrapper left\&quot;&gt;&lt;div class=\&quot;github-fork-ribbon\&quot;&gt;&lt;a href=\&quot;https://github.com/simonwhitaker/github-fork-ribbon-css\&quot;&gt;Fork me on ~GitHub&lt;/a&gt;&lt;/div&gt;\n&lt;/div&gt;\n&lt;!-- TOP LEFT RIBBON: END COPYING HERE --&gt;\n\n\n&lt;!-- BOTTOM RIGHT RIBBON: START COPYING HERE --&gt;\n&lt;div class=\&quot;github-fork-ribbon-wrapper right-bottom\&quot;&gt;&lt;div class=\&quot;github-fork-ribbon\&quot;&gt;&lt;a href=\&quot;https://github.com/simonwhitaker/github-fork-ribbon-css\&quot;&gt;Fork me on ~GitHub&lt;/a&gt;&lt;/div&gt;\n&lt;/div&gt;\n&lt;!-- BOTTOM RIGHT RIBBON: END COPYING HERE --&gt;\n\n&lt;!-- BOTTOM LEFT RIBBON: START COPYING HERE --&gt;\n&lt;div class=\&quot;github-fork-ribbon-wrapper left-bottom\&quot;&gt;&lt;div class=\&quot;github-fork-ribbon\&quot;&gt;&lt;a href=\&quot;https://github.com/simonwhitaker/github-fork-ribbon-css\&quot;&gt;Fork me on ~GitHub&lt;/a&gt;&lt;/div&gt;\n&lt;/div&gt;\n&lt;!-- BOTTOM LEFT RIBBON: END COPYING HERE --&gt;\n```\n&quot;
+        }
+    }
+}</pre>
+</div>
+<div author="JoaoBolila" core-version="&gt;=5.0.0" dependents="" description="Highlight.js: syntax highlighting" list="readme usage license" plugin-type="plugin" title="$:/plugins/tiddlywiki/highlight" type="application/json" version="5.1.8" revision="0" bag="default">
 <pre>{
     &quot;tiddlers&quot;: {
         &quot;$:/plugins/tiddlywiki/highlight/highlight.js&quot;: {
@@ -5811,16 +5854,56 @@ Error message and password prompt
     }
 }</pre>
 </div>
-<div created="20150605123511650" modified="20150605123528911" title="$:/SiteSubtitle" type="text/vnd.tiddlywiki">
+<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="" description="TiddlyWeb and TiddlySpace components" list="readme" plugin-type="plugin" title="$:/plugins/tiddlywiki/tiddlyweb" type="application/json" version="5.1.8" revision="0" bag="default">
+<pre>{
+    &quot;tiddlers&quot;: {
+        &quot;GettingStarted&quot;: {
+            &quot;title&quot;: &quot;GettingStarted&quot;,
+            &quot;tags&quot;: &quot;$:/tags/GettingStarted&quot;,
+            &quot;caption&quot;: &quot;Step 1&lt;br&gt;Syncing&quot;,
+            &quot;text&quot;: &quot;Welcome to ~TiddlyWiki and the ~TiddlyWiki community\n\nVisit http://tiddlywiki.com/ to find out more about ~TiddlyWiki and what it can do.\n\n! Syncing Changes to the Server\n\nBefore you can start storing important information in ~TiddlyWiki it is important to make sure that your changes are being reliably saved by the server.\n\n# Create a new tiddler using the {{$:/core/images/new-button}} button in the sidebar on the right\n# Click the {{$:/core/images/done-button}} button at the top right of the new tiddler\n# Check the ~TiddlyWiki command line for a message confirming the tiddler has been saved\n# Refresh the page in the browser to and verify that the new tiddler has been correctly saved\n&quot;
+        },
+        &quot;$:/config/SaveWikiButton/Template&quot;: {
+            &quot;title&quot;: &quot;$:/config/SaveWikiButton/Template&quot;,
+            &quot;text&quot;: &quot;$:/plugins/tiddlywiki/tiddlyweb/save/offline&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/tiddlyweb/ServerControlPanel&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/tiddlyweb/ServerControlPanel&quot;,
+            &quot;caption&quot;: &quot;Server&quot;,
+            &quot;tags&quot;: &quot;$:/tags/ControlPanel&quot;,
+            &quot;text&quot;: &quot;&lt;$reveal state=\&quot;$:/status/IsLoggedIn\&quot; type=\&quot;nomatch\&quot; text=\&quot;yes\&quot;&gt;\nLog in to ~TiddlyWeb: &lt;$button message=\&quot;tm-login\&quot;&gt;Login&lt;/$button&gt;\n&lt;/$reveal&gt;\n&lt;$reveal state=\&quot;$:/status/IsLoggedIn\&quot; type=\&quot;match\&quot; text=\&quot;yes\&quot;&gt;\nLogged in as {{$:/status/UserName}} &lt;$button message=\&quot;tm-logout\&quot;&gt;Logout&lt;/$button&gt;\n&lt;/$reveal&gt;\n\n----\n\nHost configuration: &lt;$edit-text tiddler=\&quot;$:/config/tiddlyweb/host\&quot; tag=\&quot;input\&quot; default=\&quot;\&quot;/&gt;\n\n&lt;blockquote&gt;//for example, `$protocol$//$host$/folder`, where `$protocol$` is replaced by the protocol (typically `http` or `https`), and `$host$` by the host name//&lt;/blockquote&gt;\n\n----\n\n&lt;$button message=\&quot;tm-server-refresh\&quot;&gt;Refresh&lt;/$button&gt; to fetch changes from the server immediately\n&quot;
+        },
+        &quot;$:/core/templates/html-div-tiddler&quot;: {
+            &quot;title&quot;: &quot;$:/core/templates/html-div-tiddler&quot;,
+            &quot;text&quot;: &quot;&lt;!--\n\nThis template is used for saving tiddlers as an HTML DIV tag with attributes representing the tiddler fields. This version includes the tiddler changecount as the field `revision`.\n\n--&gt;`&lt;div`&lt;$fields exclude='text revision bag' template=' $name$=\&quot;$encoded_value$\&quot;'&gt;&lt;/$fields&gt;` revision=\&quot;`&lt;&lt;changecount&gt;&gt;`\&quot; bag=\&quot;default\&quot;&gt;\n&lt;pre&gt;`&lt;$view field=\&quot;text\&quot; format=\&quot;htmlencoded\&quot; /&gt;`&lt;/pre&gt;\n&lt;/div&gt;`\n&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/tiddlyweb/readme&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/tiddlyweb/readme&quot;,
+            &quot;text&quot;: &quot;This plugin runs in the browser to synchronise tiddler changes to and from a TiddlyWeb-compatible server (including TiddlyWiki 5 itself). It is inert when run under Node.js.\n\n[[Source code|https://github.com/Jermolene/TiddlyWiki5/blob/master/plugins/tiddlywiki/tiddlyweb]]\n&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/tiddlyweb/save/offline&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/tiddlyweb/save/offline&quot;,
+            &quot;text&quot;: &quot;\\define saveTiddlerFilter()\n[is[tiddler]] -[[$:/boot/boot.css]] -[[$:/HistoryList]] -[type[application/javascript]library[yes]] -[[$:/boot/boot.js]] -[[$:/boot/bootprefix.js]] -[[$:/plugins/tiddlywiki/filesystem]] -[[$:/plugins/tiddlywiki/tiddlyweb]] +[sort[title]]\n\\end\n{{$:/core/templates/tiddlywiki5.html}}\n&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/tiddlyweb/tiddlywebadaptor.js&quot;: {
+            &quot;text&quot;: &quot;/*\\\ntitle: $:/plugins/tiddlywiki/tiddlyweb/tiddlywebadaptor.js\ntype: application/javascript\nmodule-type: syncadaptor\n\nA sync adaptor module for synchronising with TiddlyWeb compatible servers\n\n\\*/\n(function(){\n\n/*jslint node: true, browser: true */\n/*global $tw: false */\n\&quot;use strict\&quot;;\n\nvar CONFIG_HOST_TIDDLER = \&quot;$:/config/tiddlyweb/host\&quot;,\n\tDEFAULT_HOST_TIDDLER = \&quot;$protocol$//$host$/\&quot;;\n\nfunction TiddlyWebAdaptor(options) {\n\tthis.wiki = options.wiki;\n\tthis.host = this.getHost();\n\tthis.recipe = undefined;\n\tthis.logger = new $tw.utils.Logger(\&quot;TiddlyWebAdaptor\&quot;);\n}\n\nTiddlyWebAdaptor.prototype.getHost = function() {\n\tvar text = this.wiki.getTiddlerText(CONFIG_HOST_TIDDLER,DEFAULT_HOST_TIDDLER),\n\t\tsubstitutions = [\n\t\t\t{name: \&quot;protocol\&quot;, value: document.location.protocol},\n\t\t\t{name: \&quot;host\&quot;, value: document.location.host}\n\t\t];\n\tfor(var t=0; t&lt;substitutions.length; t++) {\n\t\tvar s = substitutions[t];\n\t\ttext = text.replace(new RegExp(\&quot;\\\\$\&quot; + s.name + \&quot;\\\\$\&quot;,\&quot;mg\&quot;),s.value);\n\t}\n\treturn text;\n};\n\nTiddlyWebAdaptor.prototype.getTiddlerInfo = function(tiddler) {\n\treturn {\n\t\tbag: tiddler.fields.bag\n\t};\n};\n\n/*\nGet the current status of the TiddlyWeb connection\n*/\nTiddlyWebAdaptor.prototype.getStatus = function(callback) {\n\t// Get status\n\tvar self = this;\n\tthis.logger.log(\&quot;Getting status\&quot;);\n\t$tw.utils.httpRequest({\n\t\turl: this.host + \&quot;status\&quot;,\n\t\tcallback: function(err,data) {\n\t\t\tif(err) {\n\t\t\t\treturn callback(err);\n\t\t\t}\n\t\t\t// Decode the status JSON\n\t\t\tvar json = null,\n\t\t\t\tisLoggedIn = false;\n\t\t\ttry {\n\t\t\t\tjson = JSON.parse(data);\n\t\t\t} catch (e) {\n\t\t\t}\n\t\t\tif(json) {\n\t\t\t\tself.logger.log(\&quot;Status:\&quot;,data);\n\t\t\t\t// Record the recipe\n\t\t\t\tif(json.space) {\n\t\t\t\t\tself.recipe = json.space.recipe;\n\t\t\t\t}\n\t\t\t\t// Check if we're logged in\n\t\t\t\tisLoggedIn = json.username !== \&quot;GUEST\&quot;;\n\t\t\t}\n\t\t\t// Invoke the callback if present\n\t\t\tif(callback) {\n\t\t\t\tcallback(null,isLoggedIn,json.username);\n\t\t\t}\n\t\t}\n\t});\n};\n\n/*\nAttempt to login and invoke the callback(err)\n*/\nTiddlyWebAdaptor.prototype.login = function(username,password,callback) {\n\tvar options = {\n\t\turl: this.host + \&quot;challenge/tiddlywebplugins.tiddlyspace.cookie_form\&quot;,\n\t\ttype: \&quot;POST\&quot;,\n\t\tdata: {\n\t\t\tuser: username,\n\t\t\tpassword: password,\n\t\t\ttiddlyweb_redirect: \&quot;/status\&quot; // workaround to marginalize automatic subsequent GET\n\t\t},\n\t\tcallback: function(err) {\n\t\t\tcallback(err);\n\t\t}\n\t};\n\tthis.logger.log(\&quot;Logging in:\&quot;,options);\n\t$tw.utils.httpRequest(options);\n};\n\n/*\n*/\nTiddlyWebAdaptor.prototype.logout = function(callback) {\n\tvar options = {\n\t\turl: this.host + \&quot;logout\&quot;,\n\t\ttype: \&quot;POST\&quot;,\n\t\tdata: {\n\t\t\tcsrf_token: this.getCsrfToken(),\n\t\t\ttiddlyweb_redirect: \&quot;/status\&quot; // workaround to marginalize automatic subsequent GET\n\t\t},\n\t\tcallback: function(err,data) {\n\t\t\tcallback(err);\n\t\t}\n\t};\n\tthis.logger.log(\&quot;Logging out:\&quot;,options);\n\t$tw.utils.httpRequest(options);\n};\n\n/*\nRetrieve the CSRF token from its cookie\n*/\nTiddlyWebAdaptor.prototype.getCsrfToken = function() {\n\tvar regex = /^(?:.*; )?csrf_token=([^(;|$)]*)(?:;|$)/,\n\t\tmatch = regex.exec(document.cookie),\n\t\tcsrf = null;\n\tif (match &amp;&amp; (match.length === 2)) {\n\t\tcsrf = match[1];\n\t}\n\treturn csrf;\n};\n\n/*\nGet an array of skinny tiddler fields from the server\n*/\nTiddlyWebAdaptor.prototype.getSkinnyTiddlers = function(callback) {\n\tvar self = this;\n\t$tw.utils.httpRequest({\n\t\turl: this.host + \&quot;recipes/\&quot; + this.recipe + \&quot;/tiddlers.json\&quot;,\n\t\tcallback: function(err,data) {\n\t\t\t// Check for errors\n\t\t\tif(err) {\n\t\t\t\treturn callback(err);\n\t\t\t}\n\t\t\t// Process the tiddlers to make sure the revision is a string\n\t\t\tvar tiddlers = JSON.parse(data);\n\t\t\tfor(var t=0; t&lt;tiddlers.length; t++) {\n\t\t\t\ttiddlers[t] = self.convertTiddlerFromTiddlyWebFormat(tiddlers[t]);\n\t\t\t}\n\t\t\t// Invoke the callback with the skinny tiddlers\n\t\t\tcallback(null,tiddlers);\n\t\t}\n\t});\n};\n\n/*\nSave a tiddler and invoke the callback with (err,adaptorInfo,revision)\n*/\nTiddlyWebAdaptor.prototype.saveTiddler = function(tiddler,callback) {\n\tvar self = this;\n\t$tw.utils.httpRequest({\n\t\turl: this.host + \&quot;recipes/\&quot; + encodeURIComponent(this.recipe) + \&quot;/tiddlers/\&quot; + encodeURIComponent(tiddler.fields.title),\n\t\ttype: \&quot;PUT\&quot;,\n\t\theaders: {\n\t\t\t\&quot;Content-type\&quot;: \&quot;application/json\&quot;\n\t\t},\n\t\tdata: this.convertTiddlerToTiddlyWebFormat(tiddler),\n\t\tcallback: function(err,data,request) {\n\t\t\tif(err) {\n\t\t\t\treturn callback(err);\n\t\t\t}\n\t\t\t// Save the details of the new revision of the tiddler\n\t\t\tvar etagInfo = self.parseEtag(request.getResponseHeader(\&quot;Etag\&quot;));\n\t\t\t// Invoke the callback\n\t\t\tcallback(null,{\n\t\t\t\tbag: etagInfo.bag\n\t\t\t}, etagInfo.revision);\n\t\t}\n\t});\n};\n\n/*\nLoad a tiddler and invoke the callback with (err,tiddlerFields)\n*/\nTiddlyWebAdaptor.prototype.loadTiddler = function(title,callback) {\n\tvar self = this;\n\t$tw.utils.httpRequest({\n\t\turl: this.host + \&quot;recipes/\&quot; + encodeURIComponent(this.recipe) + \&quot;/tiddlers/\&quot; + encodeURIComponent(title),\n\t\tcallback: function(err,data,request) {\n\t\t\tif(err) {\n\t\t\t\treturn callback(err);\n\t\t\t}\n\t\t\t// Invoke the callback\n\t\t\tcallback(null,self.convertTiddlerFromTiddlyWebFormat(JSON.parse(data)));\n\t\t}\n\t});\n};\n\n/*\nDelete a tiddler and invoke the callback with (err)\noptions include:\ntiddlerInfo: the syncer's tiddlerInfo for this tiddler\n*/\nTiddlyWebAdaptor.prototype.deleteTiddler = function(title,callback,options) {\n\tvar self = this,\n\t\tbag = options.tiddlerInfo.adaptorInfo.bag;\n\t// If we don't have a bag it means that the tiddler hasn't been seen by the server, so we don't need to delete it\n\tif(!bag) {\n\t\treturn callback(null);\n\t}\n\t// Issue HTTP request to delete the tiddler\n\t$tw.utils.httpRequest({\n\t\turl: this.host + \&quot;bags/\&quot; + encodeURIComponent(bag) + \&quot;/tiddlers/\&quot; + encodeURIComponent(title),\n\t\ttype: \&quot;DELETE\&quot;,\n\t\tcallback: function(err,data,request) {\n\t\t\tif(err) {\n\t\t\t\treturn callback(err);\n\t\t\t}\n\t\t\t// Invoke the callback\n\t\t\tcallback(null);\n\t\t}\n\t});\n};\n\n/*\nConvert a tiddler to a field set suitable for PUTting to TiddlyWeb\n*/\nTiddlyWebAdaptor.prototype.convertTiddlerToTiddlyWebFormat = function(tiddler) {\n\tvar result = {},\n\t\tknownFields = [\n\t\t\t\&quot;bag\&quot;, \&quot;created\&quot;, \&quot;creator\&quot;, \&quot;modified\&quot;, \&quot;modifier\&quot;, \&quot;permissions\&quot;, \&quot;recipe\&quot;, \&quot;revision\&quot;, \&quot;tags\&quot;, \&quot;text\&quot;, \&quot;title\&quot;, \&quot;type\&quot;, \&quot;uri\&quot;\n\t\t];\n\tif(tiddler) {\n\t\t$tw.utils.each(tiddler.fields,function(fieldValue,fieldName) {\n\t\t\tvar fieldString = fieldName === \&quot;tags\&quot; ?\n\t\t\t\t\t\t\t\ttiddler.fields.tags :\n\t\t\t\t\t\t\t\ttiddler.getFieldString(fieldName); // Tags must be passed as an array, not a string\n\n\t\t\tif(knownFields.indexOf(fieldName) !== -1) {\n\t\t\t\t// If it's a known field, just copy it across\n\t\t\t\tresult[fieldName] = fieldString;\n\t\t\t} else {\n\t\t\t\t// If it's unknown, put it in the \&quot;fields\&quot; field\n\t\t\t\tresult.fields = result.fields || {};\n\t\t\t\tresult.fields[fieldName] = fieldString;\n\t\t\t}\n\t\t});\n\t}\n\t// Default the content type\n\tresult.type = result.type || \&quot;text/vnd.tiddlywiki\&quot;;\n\treturn JSON.stringify(result,null,$tw.config.preferences.jsonSpaces);\n};\n\n/*\nConvert a field set in TiddlyWeb format into ordinary TiddlyWiki5 format\n*/\nTiddlyWebAdaptor.prototype.convertTiddlerFromTiddlyWebFormat = function(tiddlerFields) {\n\tvar self = this,\n\t\tresult = {};\n\t// Transfer the fields, pulling down the `fields` hashmap\n\t$tw.utils.each(tiddlerFields,function(element,title,object) {\n\t\tif(title === \&quot;fields\&quot;) {\n\t\t\t$tw.utils.each(element,function(element,subTitle,object) {\n\t\t\t\tresult[subTitle] = element;\n\t\t\t});\n\t\t} else {\n\t\t\tresult[title] = tiddlerFields[title];\n\t\t}\n\t});\n\t// Make sure the revision is expressed as a string\n\tif(typeof result.revision === \&quot;number\&quot;) {\n\t\tresult.revision = result.revision.toString();\n\t}\n\t// Some unholy freaking of content types\n\tif(result.type === \&quot;text/javascript\&quot;) {\n\t\tresult.type = \&quot;application/javascript\&quot;;\n\t} else if(!result.type || result.type === \&quot;None\&quot;) {\n\t\tresult.type = \&quot;text/x-tiddlywiki\&quot;;\n\t}\n\treturn result;\n};\n\n/*\nSplit a TiddlyWeb Etag into its constituent parts. For example:\n\n```\n\&quot;system-images_public/unsyncedIcon/946151:9f11c278ccde3a3149f339f4a1db80dd4369fc04\&quot;\n```\n\nNote that the value includes the opening and closing double quotes.\n\nThe parts are:\n\n```\n&lt;bag&gt;/&lt;title&gt;/&lt;revision&gt;:&lt;hash&gt;\n```\n*/\nTiddlyWebAdaptor.prototype.parseEtag = function(etag) {\n\tvar firstSlash = etag.indexOf(\&quot;/\&quot;),\n\t\tlastSlash = etag.lastIndexOf(\&quot;/\&quot;),\n\t\tcolon = etag.lastIndexOf(\&quot;:\&quot;);\n\tif(firstSlash === -1 || lastSlash === -1 || colon === -1) {\n\t\treturn null;\n\t} else {\n\t\treturn {\n\t\t\tbag: decodeURIComponent(etag.substring(1,firstSlash)),\n\t\t\ttitle: decodeURIComponent(etag.substring(firstSlash + 1,lastSlash)),\n\t\t\trevision: etag.substring(lastSlash + 1,colon)\n\t\t};\n\t}\n};\n\nif($tw.browser &amp;&amp; document.location.protocol.substr(0,4) === \&quot;http\&quot; ) {\n\texports.adaptorClass = TiddlyWebAdaptor;\n}\n\n})();\n&quot;,
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/tiddlyweb/tiddlywebadaptor.js&quot;,
+            &quot;type&quot;: &quot;application/javascript&quot;,
+            &quot;module-type&quot;: &quot;syncadaptor&quot;
+        }
+    }
+}</pre>
+</div>
+<div created="20150605123511650" modified="20150605123528911" title="$:/SiteSubtitle" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>On undoing, fixing, or removing commits in git</pre>
 </div>
-<div created="20150605123453728" modified="20150606051058239" title="$:/SiteTitle" type="text/vnd.tiddlywiki">
+<div created="20150605123453728" modified="20150606051058239" title="$:/SiteTitle" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Git Fix Um</pre>
 </div>
-<div list="[[First step]] [[Are you trying to find that which is lost or fix a change that was made?]]" title="$:/StoryList">
+<div list="[[First step]] [[Are you trying to find that which is lost or fix a change that was made?]]" title="$:/StoryList" revision="1" bag="default">
 <pre></pre>
 </div>
-<div plugin-type="info" title="$:/temp/info-plugin" type="application/json">
+<div plugin-type="info" title="$:/temp/info-plugin" type="application/json" revision="0" bag="default">
 <pre>{
     &quot;tiddlers&quot;: {
         &quot;$:/info/browser&quot;: {
@@ -5834,7 +5917,7 @@ Error message and password prompt
     }
 }</pre>
 </div>
-<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="$:/themes/tiddlywiki/vanilla" description="Emphasises individual tiddlers" name="Snow White" plugin-type="theme" title="$:/themes/tiddlywiki/snowwhite" type="application/json" version="5.1.8">
+<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="$:/themes/tiddlywiki/vanilla" description="Emphasises individual tiddlers" name="Snow White" plugin-type="theme" title="$:/themes/tiddlywiki/snowwhite" type="application/json" version="5.1.8" revision="0" bag="default">
 <pre>{
     &quot;tiddlers&quot;: {
         &quot;$:/themes/tiddlywiki/snowwhite/base&quot;: {
@@ -5845,7 +5928,7 @@ Error message and password prompt
     }
 }</pre>
 </div>
-<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="" description="Basic theme" name="Vanilla" plugin-type="theme" title="$:/themes/tiddlywiki/vanilla" type="application/json" version="5.1.8">
+<div author="JeremyRuston" core-version="&gt;=5.0.0" dependents="" description="Basic theme" name="Vanilla" plugin-type="theme" title="$:/themes/tiddlywiki/vanilla" type="application/json" version="5.1.8" revision="0" bag="default">
 <pre>{
     &quot;tiddlers&quot;: {
         &quot;$:/themes/tiddlywiki/vanilla/themetweaks&quot;: {
@@ -5931,7 +6014,7 @@ Error message and password prompt
     }
 }</pre>
 </div>
-<div created="20150606134230380" modified="20150606140243740" tags="TableOfContents" title="About" type="text/vnd.tiddlywiki">
+<div created="20150606134230380" modified="20150606140243740" tags="TableOfContents" title="About" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>This material was compiled and maintained by [[Seth Robertson]] and converted to this [[TiddlyWiki|http://tiddlywiki.com/]] format by [[Devin Weaver]].
 
 ~TiddlyWiki is a wiki based HTML5 application. Each card is called a tiddler.
@@ -5940,27 +6023,27 @@ Error message and password prompt
 
 {{Navigating between open tiddlers}}</pre>
 </div>
-<div color="#0080ff" created="20150605210829987" icon="$:/core/images/tip" modified="20150606055314970" tags="TableOfContents" title="Answers" type="text/vnd.tiddlywiki">
+<div color="#0080ff" created="20150605210829987" icon="$:/core/images/tip" modified="20150606055314970" tags="TableOfContents" title="Answers" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>&lt;&lt;list-links filter:&quot;[tag[Answers]] +[nsort[order]]&quot;&gt;&gt;</pre>
 </div>
-<div created="20150606033828302" modified="20150606055503785" tags="Answers" title="Arbitrarily changing all commits during all of git's history" type="text/vnd.tiddlywiki">
+<div created="20150606033828302" modified="20150606055503785" tags="Answers" title="Arbitrarily changing all commits during all of git's history" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>`git filter-branch` is a powerful, complex command that allows you to perform arbitary scriptable operations on all commits in git repository history. This flexibility can make it quite slow on big repos, and makes using the command quite difficult, so I will simply point you at the {{ManualPage}} and remind you that {{BestPractice}} is to always use `--tag-name-filter cat -- --all` unless you are really sure you know what you are doing.
 
 BTW, this is the one command I referred to earlier which will update all tags and branches, at least if you use the best practice arguments.
 </pre>
 </div>
-<div created="20150605130505209" modified="20150606055431278" order="1" tags="Questions" title="Are you trying to find that which is lost or fix a change that was made?" type="text/vnd.tiddlywiki">
+<div created="20150605130505209" modified="20150606055431278" order="1" tags="Questions" title="Are you trying to find that which is lost or fix a change that was made?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Due to previous activities (thrashing about), you may have lost some work which you would like to find and restore. Alternately, you may have made some changes which you would like to fix. Fixing includes updating, rewording, and deleting or discarding.
 
 * [[Fix a change|Have you committed?]]
 * [[Find what is lost|I have lost some commits I know I made]]
 </pre>
 </div>
-<div created="20150606034057154" modified="20150606040447496" tags="" title="BestPractice" type="text/vnd.tiddlywiki" url="http://sethrobertson.github.com/GitBestPractices/">
+<div created="20150606034057154" modified="20150606040447496" tags="" title="BestPractice" type="text/vnd.tiddlywiki" url="http://sethrobertson.github.com/GitBestPractices/" revision="0" bag="default">
 <pre>\define ext-link(name, url) [[$name$|$url$]]
 &lt;$macrocall $name=&quot;ext-link&quot; name=&quot;best practice&quot; url={{!!url}}/&gt;</pre>
 </div>
-<div created="20150605215333425" modified="20150606055527480" tags="Questions" title="Can you make a positive commit to fix the problem and what is the fix class?" type="text/vnd.tiddlywiki">
+<div created="20150605215333425" modified="20150606055527480" tags="Questions" title="Can you make a positive commit to fix the problem and what is the fix class?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>\define history(url) [[Rewriting public history|$url$#pubonce]]
 &lt;$macrocall $name=&quot;history&quot; url={{BestPractice!!url}}/&gt; is a bad idea. It requires everyone else to do special things and you must publicly announce your failure. Ideally you will create either a commit to just fix the problem, or a new `git revert` commit to create a new commit which undoes what the commit target of the revert did.
 
@@ -5972,7 +6055,7 @@ BTW, this is the one command I referred to earlier which will update all tags an
 * [[No, I am a bad person and must rewrite published history|I am a bad person and must rewrite published history]]
 </pre>
 </div>
-<div created="20150606140353318" modified="20150606142919605" tags="" title="CC BY-SA" type="text/vnd.tiddlywiki">
+<div created="20150606140353318" modified="20150606142919605" tags="" title="CC BY-SA" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>\define cc-link(content) &lt;a rel=&quot;license&quot; target=&quot;_blank&quot; href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;$content$&lt;/a&gt;
 
 &lt;div style=&quot;text-align: center&quot;&gt;
@@ -5981,10 +6064,10 @@ BTW, this is the one command I referred to earlier which will update all tags an
 
 This work is licensed under a &lt;&lt;cc-link content:&quot;Creative Commons Attribution-ShareAlike 3.0 International License&quot;&gt;&gt;.</pre>
 </div>
-<div created="20150606140622923" modified="20150606140636196" title="CCBYSA.png" type="image/png">
+<div created="20150606140622923" modified="20150606140636196" title="CCBYSA.png" type="image/png" revision="0" bag="default">
 <pre>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</pre>
 </div>
-<div created="20150606004932529" modified="20150606055934225" tags="Answers" title="Changing a single commit involving a merge" type="text/vnd.tiddlywiki">
+<div created="20150606004932529" modified="20150606055934225" tags="Answers" title="Changing a single commit involving a merge" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>\define git-cmd(branch)
 ```sh
 git rebase -p --onto $(git rev-parse nonce) HEAD^ $branch$
@@ -6032,7 +6115,7 @@ If some of the commits after the commit you changed are merge commits, please be
 You don't need it. It was just there to communicate an SHA between two steps in the above process. `git branch -d nonce`
 </pre>
 </div>
-<div created="20150606041847072" modified="20150606055950213" tags="Answers" title="Changing a single commit involving only simple commits" type="text/vnd.tiddlywiki">
+<div created="20150606041847072" modified="20150606055950213" tags="Answers" title="Changing a single commit involving only simple commits" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>You must first identify the SHA of the commit you wish to remove. {{FindingACommit}}
 
 ```sh
@@ -6046,19 +6129,19 @@ You will be dumped in an editor with a bunch of lines starting with pick. The ol
 When using &quot;edit&quot;, to change contents or author, when you are dumped into the shell to make your change, well make your change, `git add` as normal, and then run `git commit --amend` (including changing the author information with `--author`). When you are satisfied, you should run `git rebase --continue`
 </pre>
 </div>
-<div created="20150606033325591" modified="20150606055552392" tags="Questions" title="Changing all commits during all of git's history" type="text/vnd.tiddlywiki">
+<div created="20150606033325591" modified="20150606055552392" tags="Questions" title="Changing all commits during all of git's history" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>You have not pushed but still somehow want to change all commits in all of git's history? Strange.
 
 * [[Not just removing data (eg. re-arranging directory structure for all commits), or just wanting to use standard tools|Arbitrarily changing all commits during all of git's history]]
 * [[Want to only remove unwanted data (big files, private data, etc) and am willing to use a third party tool to do the job more quickly|Use The BFG to remove unwanted data, like big files or passwords, from Git repository history]]
 </pre>
 </div>
-<div created="20150606003851462" modified="20150606054334662" tags="TableOfContents" title="Comments" type="text/vnd.tiddlywiki">
+<div created="20150606003851462" modified="20150606054334662" tags="TableOfContents" title="Comments" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Comments and improvements welcome.
 
 [[Use the github issue tracker|https://github.com/SethRobertson/GitFixUm/issues]] or discuss with ~SethRobertson (and others) on [[#git|irc://irc.freenode.net/git]]</pre>
 </div>
-<div created="20150605123912463" modified="20150606142923491" tags="TableOfContents" title="Copyright" type="text/vnd.tiddlywiki">
+<div created="20150605123912463" modified="20150606142923491" tags="TableOfContents" title="Copyright" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>\define center(text) &lt;div style=&quot;text-align: center&quot;&gt;$text$&lt;/div&gt;
 Copyright ⓒ 2012 [[Seth Robertson]]
 
@@ -6080,25 +6163,25 @@ I and [[Seth Robertson]] would appreciate changes being sent back to me, being n
 
 {{Non Afilliation}}</pre>
 </div>
-<div created="20150606051107350" modified="20150606141346633" title="Devin Weaver" type="text/vnd.tiddlywiki">
+<div created="20150606051107350" modified="20150606141346633" title="Devin Weaver" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>&lt;$link to=&quot;https://github.com/sukima&quot;&gt;[img[SukiGravatar]]&lt;br&gt;''@sukima''&lt;/$link&gt;
 
 A passionate software developer specialized in ~JavaScript, front end and back end, and mobile iOS development. I dabble in photography, 360 panoramic tours, interactive fiction, and geek culture.</pre>
 </div>
-<div created="20150605132914983" modified="20150606055608329" order="3" tags="Questions" title="Discard everything or just some things?" type="text/vnd.tiddlywiki">
+<div created="20150605132914983" modified="20150606055608329" order="3" tags="Questions" title="Discard everything or just some things?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So you have not yet committed, the question is now whether you want to undo everything which you have done since the last commit or just some things, or just save what you have done?
 
 * [[Discard everything|How to undo all uncommitted changes]]
 * [[Discard some things|How to undo some uncommitted changes]]
 * [[I want to save my changes|How to save uncommitted changes]]</pre>
 </div>
-<div created="20150605222146810" modified="20150606060030165" tags="Answers" title="Discarding all local commits on this branch" type="text/vnd.tiddlywiki">
+<div created="20150605222146810" modified="20150606060030165" tags="Answers" title="Discarding all local commits on this branch" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>In order to discard all local commits on this branch, to make the local branch identical to the &quot;upstream&quot; of this branch, simply run `git reset --hard @{u}`</pre>
 </div>
-<div created="20150606003716856" modified="20150606054433330" tags="TableOfContents" title="Disclaimer" type="text/vnd.tiddlywiki">
+<div created="20150606003716856" modified="20150606054433330" tags="TableOfContents" title="Disclaimer" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Information is not promised or guaranteed to be correct, current, or complete, and may be out of date and may contain technical inaccuracies or typographical errors. Any reliance on this material is at your own risk. No one assumes any responsibility (and everyone expressly disclaims responsibility) for updates to keep information current or to ensure the accuracy or completeness of any posted information. Accordingly, you should confirm the accuracy and completeness of all posted information before making any decision related to any and all matters described.</pre>
 </div>
-<div created="20150605212049691" modified="20150606055622042" tags="Questions" title="Do you have uncommitted stuff in your working directory?" type="text/vnd.tiddlywiki">
+<div created="20150605212049691" modified="20150606055622042" tags="Questions" title="Do you have uncommitted stuff in your working directory?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So you have committed. However, before we go about fixing or removing whatever is wrong, you should first ensure that any uncommitted changes are safe, by either committing them (`git commit`) or by stashing them (`git stash save &quot;message&quot;`) or getting rid of them.
 
 `git status` will help you understand whether your working directory is clean or not. It should report nothing for perfect safety (&quot;Untracked files&quot; only are sometimes safe.)
@@ -6108,7 +6191,7 @@ A passionate software developer specialized in ~JavaScript, front end and back e
 * [[Yes, I have good changes/working directory is dirty: save it|How to save uncommitted changes]]
 </pre>
 </div>
-<div created="20150605221807755" modified="20150606055636555" tags="Questions" title="Do you want to discard all unpushed changes on this branch?" type="text/vnd.tiddlywiki">
+<div created="20150605221807755" modified="20150606055636555" tags="Questions" title="Do you want to discard all unpushed changes on this branch?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>There is a shortcut in case you want to discard all changes made on this branch since you have last pushed or in any event, to make your local branch identical to &quot;upstream&quot;. Upstream, for local tracking branches, is the place you get history from when you `git pull`: typically for master it might be origin/master. There is a variant of this option which lets you make your local branch identical to some other branch or ref.
 
 * [[Yes, I want to discard all unpushed changes|Discarding all local commits on this branch]]
@@ -6116,23 +6199,23 @@ A passionate software developer specialized in ~JavaScript, front end and back e
 * [[No, I want to fix some unpushed changes|Is the commit you want to fix the most recent?]]
 </pre>
 </div>
-<div created="20150606031806104" modified="20150606055649013" tags="Questions" title="Do you want to remove an entire commit?" type="text/vnd.tiddlywiki">
+<div created="20150606031806104" modified="20150606055649013" tags="Questions" title="Do you want to remove an entire commit?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>* [[Yes, I want to remove an entire commit|Removing an entire commit]]
 * [[No, I want to change an older commit|Do you want to remove/change/rename a particular file/directory from all commits during all of git's history]]</pre>
 </div>
-<div created="20150606030903029" modified="20150606055703075" tags="Questions" title="Do you want to remove or change the commit message/contents of the last commit?" type="text/vnd.tiddlywiki">
+<div created="20150606030903029" modified="20150606055703075" tags="Questions" title="Do you want to remove or change the commit message/contents of the last commit?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>* [[I want to remove the last commit|Removing the last commit]]
 * [[I want to update the author/message/contents of the last commit|Updating the last commit's contents or commit message]]
 * [[I want to reorder, split, merge, or significantly rework the last commit(s)|Reworking the last commit]]</pre>
 </div>
-<div created="20150606033227091" modified="20150606055823333" tags="Questions" title="Do you want to remove/change/rename a particular file/directory from all commits during all of git's history" type="text/vnd.tiddlywiki">
+<div created="20150606033227091" modified="20150606055823333" tags="Questions" title="Do you want to remove/change/rename a particular file/directory from all commits during all of git's history" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>* [[Yes please, I want to make a change involving all git commits|Changing all commits during all of git's history]]
 * [[No, I only want to change a single commit|Is a merge commit involved?]]</pre>
 </div>
-<div created="20150605220124213" modified="20150605220219158" tags="" title="FindingACommit" type="text/vnd.tiddlywiki">
+<div created="20150605220124213" modified="20150605220219158" tags="" title="FindingACommit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>You can do this using `gitk --date-order` or using `git log --graph --decorate --oneline` or perhaps `git log --oneline -- filename` You are looking for the 40 character SHA-1 hash ID (or the 7 character abbreviation). Yes, if you know the &quot;^&quot; or &quot;~&quot; shortcuts you may use those.</pre>
 </div>
-<div created="20150605123636039" modified="20150606054149032" tags="TableOfContents" title="First step" type="text/vnd.tiddlywiki">
+<div created="20150605123636039" modified="20150606054149032" tags="TableOfContents" title="First step" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>\define backup(url) [[backup|$url$#backups]]
 A git [[choose-your-own-adventure!ⓡ|Non Afilliation]]
 
@@ -6144,10 +6227,14 @@ Strongly consider taking a &lt;$macrocall $name=&quot;backup&quot; url={{BestPra
 
 Answer the questions posed by clicking the link for that section. A section with no links is a terminal node and you should have solved your problem by completing the suggestions posed by that node (if not, then report the chain of answers you made on #git or some other git resource and explain further why the proposed answer doesn't help). This is not a document to read linearly.</pre>
 </div>
-<div created="20150606142306908" modified="20150606142327725" tags="" title="GNU FDL" type="text/vnd.tiddlywiki">
+<div created="20150619122316900" modified="20150619122432459" tags="$:/tags/PageTemplate" title="GitHubRibbon" type="text/vnd.tiddlywiki" revision="0" bag="default">
+<pre>&lt;div class=&quot;github-fork-ribbon-wrapper right&quot;&gt;&lt;div class=&quot;github-fork-ribbon&quot;&gt;&lt;a href=&quot;https://github.com/sukima/GitFixUm&quot;&gt;Fork me on ~GitHub&lt;/a&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+</div>
+<div created="20150606142306908" modified="20150606142327725" tags="" title="GNU FDL" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>[[GNU Free Documentation v1.3|http://www.gnu.org/licenses/fdl.html]] with no Invariant, Front, or Back Cover texts.</pre>
 </div>
-<div created="20150605132135076" modified="20150606055835668" order="2" tags="Questions" title="Have you committed?" type="text/vnd.tiddlywiki">
+<div created="20150605132135076" modified="20150606055835668" order="2" tags="Questions" title="Have you committed?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>If you have not yet committed that which you do not want, git does not know anything about what you have done yet, so it is pretty easy to undo what you have done.
 
 * [[I am in the middle of a bad merge|Recovering from a borked/stupid/moribund merge]]
@@ -6155,7 +6242,7 @@ Answer the questions posed by clicking the link for that section. A section with
 * [[Yes, commits were made|Do you have uncommitted stuff in your working directory?]]
 * [[No, I have not yet committed|Discard everything or just some things?]]</pre>
 </div>
-<div created="20150605213557369" modified="20150606055848564" tags="Questions" title="Have you pushed?" type="text/vnd.tiddlywiki">
+<div created="20150605213557369" modified="20150606055848564" tags="Questions" title="Have you pushed?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So you have committed, the question is now whether you have made your changes (or at least the changes you are interesting in &quot;fixing&quot;) publicly available or not. Publishing history is a seminal event.
 
 If you are dealing with commits someone else made, then this question covers whether they have pushed, and since you have their commits, the answer is almost certainly &quot;yes&quot;.
@@ -6168,7 +6255,7 @@ Also note that these commands will fix up the referenced commits in your reposit
 * [[No pushes|Do you want to discard all unpushed changes on this branch?]]
 </pre>
 </div>
-<div created="20150606023420818" modified="20150606060044683" tags="Answers" title="How to save uncommitted changes" type="text/vnd.tiddlywiki">
+<div created="20150606023420818" modified="20150606060044683" tags="Answers" title="How to save uncommitted changes" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>There are five ways you can save your uncommitted change. I also suggest you read [[Pro Git|http://git-scm.com/book/]] as these are pretty basic git operations.
 
 {{UncommittedChangesCheatSheet}}
@@ -6176,12 +6263,12 @@ Also note that these commands will fix up the referenced commits in your reposit
 Using `git add -p` to add/commit only some changes to make multiple commits is left as an exercise for the reader.
 </pre>
 </div>
-<div created="20150605212624370" modified="20150606060059196" tags="Answers" title="How to undo all uncommitted changes" type="text/vnd.tiddlywiki">
+<div created="20150605212624370" modified="20150606060059196" tags="Answers" title="How to undo all uncommitted changes" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So you have not yet committed and you want to undo everything. Well, {{BestPractice}} is for you to stash the changes in case you were mistaken and later decide that you really wanted them after all. `git stash save &quot;description of changes&quot;`. You can revisit those stashes later `git stash list` and decide whether to `git stash drop` them after some time has past. Please note that untracked and ignored files are not stashed by default. See &quot;--include-untracked&quot; and &quot;--all&quot; for stash options to handle those two cases.
 
 However, perhaps you are confident (or arrogant) enough to know for sure that you will never ever want the uncommitted changes. If so, you can run `git reset --hard`, however please be quite aware that this is almost certainly a completely unrecoverable operation. Any changes which are removed here cannot be restored later. This will not delete untracked or ignored files. Those can be deleted with `git clean -nd` or `git clean -ndX` respectively, or `git clean -ndx` for both at once. Well, actually those command do not delete the files. They show what files will be deleted. Replace the &quot;n&quot; in &quot;-nd…&quot; with &quot;f&quot; to actually delete the files. {{BestPractice}} is to ensure you are not deleting what you should not by looking at the moribund filenames first.</pre>
 </div>
-<div created="20150605213006215" modified="20150606060111915" tags="Answers" title="How to undo some uncommitted changes" type="text/vnd.tiddlywiki">
+<div created="20150605213006215" modified="20150606060111915" tags="Answers" title="How to undo some uncommitted changes" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So you have not yet committed and you want to undo some things, well `git status` will tell you exactly what you need to do. For example:
 
 {{SampleGitStatus}}
@@ -6189,7 +6276,7 @@ However, perhaps you are confident (or arrogant) enough to know for sure that yo
 However, the `git checkout` in file mode is a command that cannot be recovered from—the changes which are discarded most probably cannot be recovered. Perhaps you should run `git stash save -p &quot;description&quot;` instead, and select the changes you no longer want to be stashed instead of zapping them.
 </pre>
 </div>
-<div created="20150605212641932" modified="20150606060124985" tags="Answers" title="How to undo uncommitted changes" type="text/vnd.tiddlywiki">
+<div created="20150605212641932" modified="20150606060124985" tags="Answers" title="How to undo uncommitted changes" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>!! How to undo all uncommitted changes
 
 {{How to undo all uncommitted changes}}
@@ -6198,13 +6285,13 @@ However, the `git checkout` in file mode is a command that cannot be recovered f
 
 {{How to undo some uncommitted changes}}</pre>
 </div>
-<div created="20150605221421477" modified="20150606060138091" tags="Answers" title="I am a bad person and must rewrite published history" type="text/vnd.tiddlywiki">
+<div created="20150605221421477" modified="20150606060138091" tags="Answers" title="I am a bad person and must rewrite published history" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Hopefully you read the previous reference and fully understand why this is bad and what you have to tell everyone else to do in order to recover from this condition. Assuming this, you simply need to go to the parts of this document which assume that you have not yet pushed and do them as normal. Then you need to do a &quot;force push&quot; `git push -f` to thrust your updated history upon everyone else. As you read in the reference, this may be denied by default by your upstream repository (see `git config receive.denyNonFastForwards`, but can be disabled (temporarily I suggest) if you have access to the server. You then will need to send mail to everyone who might have pulled the history telling them that history was rewritten and they need to `git pull --rebase` and do a bit of history rewriting of their own if they branched or tagged from the now outdated history.
 
 Proceed with [[fixing the old commit|Do you want to discard all unpushed changes on this branch?]].
 </pre>
 </div>
-<div created="20150605211409956" modified="20150606044140428" title="I have lost some commits I know I made" type="text/vnd.tiddlywiki">
+<div created="20150605211409956" modified="20150606044140428" title="I have lost some commits I know I made" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>First make sure that it was not on a different branch. Try `git log -Sfoo --all` where &quot;foo&quot; is replaced with something unique in the commits you made. You can also search with `gitk --all --date-order` to see if anything looks likely.
 
 Check your stashes, `git stash list`, to see if you might have stashed instead of committing. You can also visualize what the stashes might be associated with via:
@@ -6234,14 +6321,14 @@ done
 Once you find the changes you are interested in, there are several ways you can proceed. You can `git reset --hard SHA` your current branch to the history and current state of that SHA (probably not recommended for stashes), you can `git branch newbranch SHA` to link the old history to a new branch name (also not recommended for stashes), you can `git stash apply SHA` (for the non-index commit in a git-stash), you can `git stash merge SHA` or `git cherry-pick SHA` (for either part of a stash or non-stashes), etc.
 </pre>
 </div>
-<div created="20150606041758313" modified="20150606055901501" tags="Questions" title="Is a merge commit involved?" type="text/vnd.tiddlywiki">
+<div created="20150606041758313" modified="20150606055901501" tags="Questions" title="Is a merge commit involved?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>If the commit you are trying to change is a merge commit, or if there is a merge commit between the commit you are trying to change and the tip of the branch you are on, then you need to do some special handling of the situation.
 
 * [[Yes, a merge commit is involved|Changing a single commit involving a merge]]
 * [[No, only simple commits|Changing a single commit involving only simple commits]]
 </pre>
 </div>
-<div created="20150606003058224" modified="20150606055913790" tags="Questions" title="Is the commit you want to fix the most recent?" type="text/vnd.tiddlywiki">
+<div created="20150606003058224" modified="20150606055913790" tags="Questions" title="Is the commit you want to fix the most recent?" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>While the techniques mentioned to deal with deeper commits will work on the most recent, there are some convenient shortcuts you can take with the most recent commit.
 
 * [[Yes, I want to change the most recent commit|Do you want to remove or change the commit message/contents of the last commit?]]
@@ -6252,10 +6339,10 @@ Once you find the changes you are interested in, there are several ways you can 
 * [[Either way, I want to move a commit from one branch to another|Moving a commit from one branch to another]]
 </pre>
 </div>
-<div created="20150605220951394" modified="20150606060149818" tags="Answers" title="Making a new commit to fix an old commit" type="text/vnd.tiddlywiki">
+<div created="20150605220951394" modified="20150606060149818" tags="Answers" title="Making a new commit to fix an old commit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>If the problem in the old commit is just something was done incorrectly, go ahead and make a normal commit to fix the problem. Feel free to reference the old commit SHA in the commit message, and if you are into the blame-based development methodology, make fun of the person who made the mistake (or someone who recently left if you made the mistake).</pre>
 </div>
-<div created="20150605215655631" modified="20150606060201897" tags="Answers" title="Making a new commit to restore a file deleted earlier" type="text/vnd.tiddlywiki">
+<div created="20150605215655631" modified="20150606060201897" tags="Answers" title="Making a new commit to restore a file deleted earlier" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>The file may have been deleted or every change to that file in that commit (and all commits since then) should be destroyed. If so, you can simply checkout a version of the file which you know is good.
 
 You must first identify the SHA of the commit containing the good version of the file. {{FindingACommit}}
@@ -6267,10 +6354,10 @@ git checkout SHA -- path/to/filename
 Obviously replace &quot;SHA&quot; with the reference that is good. You can then add and commit as normal to fix the problem.
 </pre>
 </div>
-<div created="20150606042210220" modified="20150606042222075" tags="" title="ManualPage" type="text/vnd.tiddlywiki">
+<div created="20150606042210220" modified="20150606042222075" tags="" title="ManualPage" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>[[manual page|http://jk.gs/git-filter-branch.html]]</pre>
 </div>
-<div created="20150606032514573" modified="20150606060213728" tags="Answers" title="Moving a commit from one branch to another" type="text/vnd.tiddlywiki">
+<div created="20150606032514573" modified="20150606060213728" tags="Answers" title="Moving a commit from one branch to another" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So, you have a commit which is in the wrong place and you want to move it from one branch to another. In order to do this, you will need to know the SHA of the first and last commit (in a continuous series of commits) you want to move (those values are the same if you are moving only one commit), the name of the branch you are moving the commit from, and the name of the branch you are moving the commit to. In the example below, I will name these four values $first, $last, $source, and $destination (respectively). Additionally, you will need to use a {{nonce}} branch as a placeholder. I will call the nonce branch &quot;nonce&quot; in the following example. However, you may use any branch name that is not currently in use. You can delete it immediately after you are done.
 
 ```sh
@@ -6299,7 +6386,7 @@ git rebase -p --onto $first^ $last $source
 Using `gitk --all --date-order` one last time, you should now see that the commits on the source branch have gone away. You have successfully moved the commits. Please check very carefully if merges occurred after the commits which were deleted. They may have been recreated incorrectly. If so you can either [[undo the delete|Undoing the last few git operations affecting HEAD/my branch's tip]] or try to delete the bad merge and try to recreate it manually, or create a fake (`--ours`) merge from the same SHA so that git is aware that the merge occurred.
 </pre>
 </div>
-<div created="20150606140030032" modified="20150606140051362" tags="" title="Navigating between open tiddlers" type="text/vnd.tiddlywiki">
+<div created="20150606140030032" modified="20150606140051362" tags="" title="Navigating between open tiddlers" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>In the default &quot;classic&quot; storyview mode, open tiddlers are displayed in a vertical column called the &quot;story river&quot;. There are a number of ways you can navigate the story river - that is, how you can jump back and forth between the open tiddlers.
 
 * The best approach is to ''use the Open tab'' in the sidebar to click on the open tiddler to which you wish to navigate.
@@ -6316,26 +6403,26 @@ Using `gitk --all --date-order` one last time, you should now see that the commi
 ** Closing the bottom tiddler will close it and the bottom of the tiddler above it will come into view.
 </pre>
 </div>
-<div created="20150605123858545" modified="20150605123902709" title="Non Afilliation" type="text/vnd.tiddlywiki">
+<div created="20150605123858545" modified="20150605123902709" title="Non Afilliation" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Not affiliated with Chooseco, LLC's &quot;Choose Your Own Adventure&quot;ⓡ. Good books, but a little light on the details of recovering from git merge errors to my taste.</pre>
 </div>
-<div created="20150606032638910" modified="20150606032644672" tags="" title="nonce" type="text/vnd.tiddlywiki">
+<div created="20150606032638910" modified="20150606032644672" tags="" title="nonce" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>[[nonce|http://en.wiktionary.org/wiki/nonce]]</pre>
 </div>
-<div color="#ffcc66" created="20150605210750047" icon="$:/core/images/help" modified="20150606055333607" tags="TableOfContents" title="Questions" type="text/vnd.tiddlywiki">
+<div color="#ffcc66" created="20150605210750047" icon="$:/core/images/help" modified="20150606055333607" tags="TableOfContents" title="Questions" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>&lt;&lt;list-links filter:&quot;[tag[Questions]] +[nsort[order]]&quot;&gt;&gt;</pre>
 </div>
-<div created="20150605210552666" modified="20150606060227931" tags="Answers" title="Recovering from a borked/stupid/moribund merge" type="text/vnd.tiddlywiki">
+<div created="20150605210552666" modified="20150606060227931" tags="Answers" title="Recovering from a borked/stupid/moribund merge" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So, you were in the middle of a merge, have encountered one or more conflicts, and you have now decided that it was a big mistake and want to get out of the merge.
 
 The fastest way out of the merge is `git merge --abort`</pre>
 </div>
-<div created="20150605210637999" modified="20150606060240821" tags="Answers" title="Recovering from a borked/stupid/moribund rebase" type="text/vnd.tiddlywiki">
+<div created="20150605210637999" modified="20150606060240821" tags="Answers" title="Recovering from a borked/stupid/moribund rebase" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>So, you were in the middle of a rebase, have encountered one or more conflicts, and you have now decided that it was a big mistake and want to get out of the merge.
 
 The fastest way out of the merge is `git rebase --abort`</pre>
 </div>
-<div created="20150606031856578" modified="20150606133826057" tags="Answers" title="Removing an entire commit" type="text/vnd.tiddlywiki">
+<div created="20150606031856578" modified="20150606133826057" tags="Answers" title="Removing an entire commit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>I call this operation //cherry-pit// since it is the inverse of a //cherry-pick//. {{FindingACommit}}
 
 ```sh
@@ -6347,7 +6434,7 @@ Obviously replace &quot;SHA&quot; with the reference you want to get rid of. The
 However, please be warned. If some of the commits between SHA and the tip of your branch are merge commits, it is possible that `git rebase -p` will be unable to properly recreate them. Please inspect the resulting merge topology `gitk --date-order HEAD ORIG_HEAD` and contents to ensure that git did want you wanted. If it did not, there is not really any automated recourse. You can reset back to the commit before the SHA you want to get rid of, and then cherry-pick the normal commits and manually re-merge the //bad// merges. Or you can just suffer with the inappropriate topology (perhaps creating fake merges `git merge --ours otherbranch` so that subsequent development work on those branches will be properly merged in with the correct merge-base).
 </pre>
 </div>
-<div created="20150606030957326" modified="20150606133842612" tags="Answers" title="Removing the last commit" type="text/vnd.tiddlywiki">
+<div created="20150606030957326" modified="20150606133842612" tags="Answers" title="Removing the last commit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>To remove the last commit from git, you can simply run `git reset --hard HEAD^` If you are removing multiple commits from the top, you can run `git reset --hard HEAD~2` to remove the last two commits. You can increase the number to remove even more commits.
 
 If you want to &quot;uncommit&quot; the commits, but keep the changes around for [[reworking|Reworking the last commit]], remove the &quot;--hard&quot;: `git reset HEAD^` which will evict the commits from the branch and from the index, but leave the working tree around.
@@ -6355,7 +6442,7 @@ If you want to &quot;uncommit&quot; the commits, but keep the changes around for
 If you want to save the commits on a new branch name, then run `git branch newbranchname` before doing the git reset.
 </pre>
 </div>
-<div created="20150605222251580" modified="20150606133857957" tags="Answers" title="Replacing all branch history/contents" type="text/vnd.tiddlywiki">
+<div created="20150605222251580" modified="20150606133857957" tags="Answers" title="Replacing all branch history/contents" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>If instead of discarding all local commits, you can make your branch identical to some other branch, tag, ref, or SHA that exists on your system.
 
 The first thing you need to do is identify the SHA or ref of the good state of your branch. {{FindingACommit}}
@@ -6369,7 +6456,7 @@ git reset --hard REF
 Obviously replace &quot;REF&quot; with the reference or SHA you want to get back to.
 </pre>
 </div>
-<div created="20150605215904208" modified="20150606133914742" tags="Answers" title="Reverting a merge commit" type="text/vnd.tiddlywiki">
+<div created="20150605215904208" modified="20150606133914742" tags="Answers" title="Reverting a merge commit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Oh dear. This is going to get complicated.
 
 To create an positive commit to remove the effects of a merge commit, you must first identify the SHA of the commit you want to revert. {{FindingACommit}}
@@ -6397,7 +6484,7 @@ Another option is to abandon the branch you merged from, recreate it from the pr
 This approach has the advantage that the recreated donor branch will have cleaner history, but especially if there have been many commits (and especially merges) to the branch, it can be a lot of work. At this time, I will not walk you through the process of recreating the donor branch. Given sufficient demand I can try to add that. However, if you look at howto/revert-a-faulty-merge.txt (also shipped as part of the git distribution) it will provide more words than you can shake a stick at.
 </pre>
 </div>
-<div created="20150605220607986" modified="20150606133930557" tags="Answers" title="Reverting an old simple pushed commit" type="text/vnd.tiddlywiki">
+<div created="20150605220607986" modified="20150606133930557" tags="Answers" title="Reverting an old simple pushed commit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>To create an positive commit to remove the effects of a simple (non-merge) commit, you must first identify the SHA of the commit you want to revert. {{FindingACommit}}
 
 ```sh
@@ -6407,7 +6494,7 @@ git revert SHA
 Obviously replace &quot;SHA&quot; with the reference you want to revert. If you want to revert multiple SHA, you may specify a range or a list of SHA.
 </pre>
 </div>
-<div created="20150606031342816" modified="20150606133943863" tags="Answers" title="Reworking the last commit" type="text/vnd.tiddlywiki">
+<div created="20150606031342816" modified="20150606133943863" tags="Answers" title="Reworking the last commit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>''WARNING:'' These techniques should only be used for non-merge commits. If you have a merge commit, you are better off deleting the merge and recreating it.
 
 If you want to perform significant work on the last commit, you can simply `git reset HEAD^`. This will undo the commit (peel it off) and restore the index to the state it was in before that commit, leaving the working directory with the changes uncommitted, and you can fix whatever you need to fix and try again.
@@ -6417,7 +6504,7 @@ You can do this with multiple (non-merge) commits in a row (using `HEAD^^` or si
 If you want to reorder commits, split them, merge them together, or otherwise perfect the commits, you should explore [[Post Production Editing Using Git|http://sethrobertson.github.com/GitPostProduction]].
 </pre>
 </div>
-<div created="20150605221301106" modified="20150606134000820" tags="Answers" title="Rewriting an old branch with a new branch with a new commit" type="text/vnd.tiddlywiki">
+<div created="20150605221301106" modified="20150606134000820" tags="Answers" title="Rewriting an old branch with a new branch with a new commit" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>If the state of a branch is contaminated beyond repair and you have pushed that branch or otherwise do not want to rewrite the existing history, then you can make a new commit which overwrites the original branch with the new one and pretends this was due to a merge. The command is a bit complicated, and will get rid of all ignored or untracked files in your working directory, so please be sure you have properly backed up everything.
 
 In the following example please replace $destination with the name of the branch whose contents you want to overwrite. $source should be replaced with the name of the branch whose contents are good.
@@ -6449,7 +6536,7 @@ git commit -m &quot;Rewrite $destination with $source&quot;
 ```
 </pre>
 </div>
-<div created="20150606045637198" modified="20150606045850731" tags="" title="SampleGitStatus" type="text/vnd.tiddlywiki">
+<div created="20150606045637198" modified="20150606045850731" tags="" title="SampleGitStatus" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>&lt;pre&gt;On branch master
 Changes to be committed:
   (use &quot;git reset HEAD &amp;lt;file&amp;gt;...&quot; to unstage)
@@ -6469,22 +6556,22 @@ Untracked files:
 &lt;/pre&gt;
 </pre>
 </div>
-<div created="20150606042656671" modified="20150606042741719" tags="" title="Seth Robertson" type="text/vnd.tiddlywiki">
+<div created="20150606042656671" modified="20150606042741719" tags="" title="Seth Robertson" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>; Homepage
 : http://sethrobertson.github.io/</pre>
 </div>
-<div _canonical_uri="http://gravatar.com/avatar/a33233f156a5531707f130c28565de69" created="20150606051510231" height="80" modified="20150606051608860" tags="" title="SukiGravatar" type="image/png" width="80">
+<div _canonical_uri="http://gravatar.com/avatar/a33233f156a5531707f130c28565de69" created="20150606051510231" height="80" modified="20150606051608860" tags="" title="SukiGravatar" type="image/png" width="80" revision="0" bag="default">
 <pre></pre>
 </div>
-<div caption="{{$:/language/SideBar/Contents/Caption}}" color="#66ccff" created="20150606052850055" list="[[First step]] Questions Answers Comments Thanks Disclaimer Copyright About" list-after="$:/core/ui/SideBar/Open" modified="20150606134323938" tags="$:/tags/SideBar" title="TableOfContents" type="text/vnd.tiddlywiki">
+<div caption="{{$:/language/SideBar/Contents/Caption}}" color="#66ccff" created="20150606052850055" list="[[First step]] Questions Answers Comments Thanks Disclaimer Copyright About" list-after="$:/core/ui/SideBar/Open" modified="20150606134323938" tags="$:/tags/SideBar" title="TableOfContents" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>&lt;div class=&quot;tc-table-of-contents&quot;&gt;
 &lt;&lt;toc-selective-expandable &quot;TableOfContents&quot;&gt;&gt;
 &lt;/div&gt;</pre>
 </div>
-<div created="20150606003826255" modified="20150606054445526" tags="TableOfContents" title="Thanks" type="text/vnd.tiddlywiki">
+<div created="20150606003826255" modified="20150606054445526" tags="TableOfContents" title="Thanks" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Thanks to the experts on #git and my coworkers for review, feedback, and ideas.</pre>
 </div>
-<div created="20150606024958984" modified="20150606030104503" tags="" title="UncommittedChangesCheatSheet" type="text/vnd.tiddlywiki">
+<div created="20150606024958984" modified="20150606030104503" tags="" title="UncommittedChangesCheatSheet" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>&lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;
@@ -6541,7 +6628,7 @@ git stash save &quot;my descriptive name&quot;
 &lt;/table&gt;
 </pre>
 </div>
-<div created="20150606004401538" modified="20150606134015599" tags="Answers" title="Undoing the last few git operations affecting HEAD/my branch's tip" type="text/vnd.tiddlywiki">
+<div created="20150606004401538" modified="20150606134015599" tags="Answers" title="Undoing the last few git operations affecting HEAD/my branch's tip" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>Practically every git operation which affects the repository is recorded in the `git reflog`. You may then use the reflog to look at the state of the branches at previous times or even go back to the state of the local branch at the time.
 
 While this happens for every git command affecting HEAD, it is usually most interesting when attempting to recover from a bad rebase or reset or an --amend'ed commit. There are better ways (listed by the rest of this document) from recovering from the more mundane reflog updates.
@@ -6565,7 +6652,7 @@ Obviously replace &quot;SHA&quot; in both commands with the reference you want t
 Note that any other commits you have performed since you did that &quot;bad&quot; operation will then be lost. You could `git cherry-pick` or `git rebase -p --onto` those other commits over.
 </pre>
 </div>
-<div created="20150606031550308" modified="20150606134030576" tags="Answers" title="Updating the last commit's contents or commit message" type="text/vnd.tiddlywiki">
+<div created="20150606031550308" modified="20150606134030576" tags="Answers" title="Updating the last commit's contents or commit message" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>To update the last commit's contents, author, or commit message for a commit which you have not pushed or otherwise published, first you need to get the index into the correct state you wish the commit to reflect. If you are changing the commit message only, you need do nothing. If you are changing the file contents, typically you would modify the working directory and use `git add` as normal.
 
 Note if you wish to restore a file to a known good state, you can use: `git checkout GOODSHA -- path/to/filename`.
@@ -6575,7 +6662,7 @@ Once the index is in the correct state, then you can run `git commit --amend` to
 If you want to do something more sophisticated that what `--amend` allows, please investigate [[reworking|Reworking the last commit]] the last commit.
 </pre>
 </div>
-<div created="20150606033437797" modified="20150606134059276" tags="Answers" title="Use The BFG to remove unwanted data, like big files or passwords, from Git repository history" type="text/vnd.tiddlywiki">
+<div created="20150606033437797" modified="20150606134059276" tags="Answers" title="Use The BFG to remove unwanted data, like big files or passwords, from Git repository history" type="text/vnd.tiddlywiki" revision="0" bag="default">
 <pre>''Disclaimer'', the author of this document has not qualified this tool (including for safety or usability for any purpose), but recognizes the need which this tool fills for large repositories.
 
 [[The BFG|http://rtyley.github.io/bfg-repo-cleaner/]] is a simpler, faster alternative to `git filter-branch`, specifically designed for cleansing bad data out of your Git repository history - it operates over all branches and tags in your project to purge data you don't want retained ''anywhere''. Some [[examples|http://rtyley.github.io/bfg-repo-cleaner/#examples]]:
