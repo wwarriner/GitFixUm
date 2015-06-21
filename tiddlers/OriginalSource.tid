@@ -1,0 +1,12 @@
+created: 20150621213039446
+modified: 20150621213846480
+tags: TableOfContents
+title: OriginalSource
+type: text/vnd.tiddlywiki
+url: http://sethrobertson.github.io/GitFixUm/fixup.html
+
+The original source is available at ''{{!!url}}''.
+
+<<<
+[[Seth Robertson]] has maintained the content in the form of a single HTML file using anchor tags. I wanted a more modern version and developed this site. I since submitted the conversion as a [[Pull Request|https://github.com/SethRobertson/GitFixUm/pull/12]]. Responses to Pull Requests on the project are vastly sparse and so to move the project forward I'm hosting maintaining ''this'' converted version myself.
+<<< [[Devin Weaver]]

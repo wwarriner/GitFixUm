@@ -1,10 +1,12 @@
 created: 20150606134230380
-modified: 20150606140243740
+modified: 20150621212837424
 tags: TableOfContents
 title: About
 type: text/vnd.tiddlywiki
 
 This material was compiled and maintained by [[Seth Robertson]] and converted to this [[TiddlyWiki|http://tiddlywiki.com/]] format by [[Devin Weaver]].
+
+The OriginalSource is available at {{OriginalSource!!url}}.
 
 ~TiddlyWiki is a wiki based HTML5 application. Each card is called a tiddler.
 
