@@ -1,5 +1,5 @@
 created: 20150606024958984
-modified: 20150606030104503
+modified: 20160308202730004
 tags: 
 title: UncommittedChangesCheatSheet
 type: text/vnd.tiddlywiki
@@ -15,45 +15,55 @@ type: text/vnd.tiddlywiki
     <tr>
       <td>Commit them on the local branch.</td>
       <td>
-<pre>
+
+```bash
 git commit -am "My descriptive message"
-</pre>
+
+```
       </td>
     </tr>
     <tr>
       <td>Commit them on another branch, no checkout conflicts.</td>
       <td>
-<pre>
+
+```bash
 git checkout otherbranch &amp;&amp; git commit -am "My descriptive message"
-</pre>
+```
+
       </td>
     </tr>
     <tr>
       <td>Commit them on another branch, conflicts.</td>
       <td>
-<pre>
+
+```bash
 git stash
 git checkout otherbranch
 git stash apply # Resolve any conflicts
 git commit      # Write a well worded/formatted commit message
 git stash drop
-</pre>
+```
+
       </td>
     </tr>
     <tr>
       <td>Commit them on a new branch.</td>
       <td>
-<pre>
+
+```bash
 git checkout -b newbranch; git commit -am "My descriptive message"
-</pre>
+```
+
       </td>
     </tr>
     <tr>
       <td>Stash them for a rainy day.</td>
       <td>
-<pre>
+
+```bash
 git stash save "my descriptive name"
-</pre>
+```
+
       </td>
     </tr>
   </tbody>
