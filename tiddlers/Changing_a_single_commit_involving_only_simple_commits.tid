@@ -4,7 +4,7 @@ tags: Answers
 title: Changing a single commit involving only simple commits
 type: text/vnd.tiddlywiki
 
-You must first identify the SHA of the commit you wish to remove. {{FindingACommit}}
+You must first identify the SHA of the commit you wish to change. {{FindingACommit}}
 
 ```sh
 git rebase -i SHA^
